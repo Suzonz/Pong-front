@@ -1,0 +1,40 @@
+name: Test at push
+
+on:
+  push:
+    branches:
+     - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: github.ref=='refs/heads/develop'
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v6.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v6.1.0
+        with: 
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test > test-logs.txt 2>&1
+
+      - name: Upload test
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: test_logs
+          path: test-logs.txt
+
+      - name: Show tests
+        run: cat test-logs.txt
+
+      - name: Création de la Pull Request
+        run: gh pr create --base main --head ${{ github.ref_name }} --title "Nouvelle fonctionnalité" --body "Cette pull request ajoute une nouvelle fonctionnalité." || true
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        
