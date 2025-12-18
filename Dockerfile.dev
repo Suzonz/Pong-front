@@ -1,6 +1,6 @@
 FROM node:24-alpine
 
-WORKDIR /pong/front
+WORKDIR /app
 
 COPY package.json package-lock.json* ./
 
